@@ -1,12 +1,14 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { tmdb_key, dbUser, dbPass } = require('../config.json');
+const { tmdb_key, dbUser, dbPass, dbName } = require('../config.json');
 const https = require('https');
 const mysql = require('mysql2');
 
 const dbConnection = mysql.createConnection({
+  multipleStatements: true,
   host: 'localhost',
   user: dbUser,
-  password: dbPass
+  password: dbPass,
+  database: dbName
 });
 
 dbConnection.connect((err) => {
@@ -44,16 +46,37 @@ module.exports = {
 
 let createMovieEmbed = (parsedMovie) => {
   let movieChoice = parsedMovie.results[Math.floor(Math.random() * 20)];
-  let imageURL = `https://image.tmdb.org/t/p/original/${movieChoice.poster_path}`;
-  let movieTitle = movieChoice.original_title;
-  let movieDescription = movieChoice.overview;
+  let movieRecommendation = {
+    imageURL: `https://image.tmdb.org/t/p/original/${movieChoice.poster_path}`,
+    title: movieChoice.original_title,
+    description: movieChoice.overview
+  }
 
   const movieEmbed = new EmbedBuilder()
     .setColor(0xFFA500)
-    .setTitle(movieTitle)
-    .setDescription(movieDescription)
-    .setImage(imageURL);
+    .setTitle(movieRecommendation.title)
+    .setDescription(movieRecommendation.description)
+    .setImage(movieRecommendation.imageURL);
 
   console.log(movieChoice);
+  setMovieForUser(movieRecommendation);
   return movieEmbed;
-}
+};
+
+let setMovieForUser = (movie) => {
+  let sql = `CREATE TABLE if not exists userlist (username VARCHAR(25) PRIMARY KEY, title VARCHAR(50), url VARCHAR(100));  
+            INSERT INTO userlist (username, title, url) VALUES ('cmoorelabs', '${movie.title}', '${movie.imageURL}')`;
+  dbConnection.query(sql, (error, result) =>  {
+    if(error) throw error;
+    console.log("1 record inserted");
+    getUserMovieList();
+  });
+
+  let getUserMovieList = () => {
+    let sql = `SELECT * FROM userlist`;
+    dbConnection.query(sql, (error, result) => {
+      if(error) throw error;
+      console.log(result);
+    })
+  }
+}; 
