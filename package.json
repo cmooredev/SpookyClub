@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.6.0",
-    "mysql": "^2.18.1"
+    "mysql2": "^2.3.3"
   }
 }

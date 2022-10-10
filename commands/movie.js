@@ -1,7 +1,18 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { tmdb_key } = require('../config.json');
+const { tmdb_key, dbUser, dbPass } = require('../config.json');
 const https = require('https');
-const mysql = require('mysql');
+const mysql = require('mysql2');
+
+const dbConnection = mysql.createConnection({
+  host: 'localhost',
+  user: dbUser,
+  password: dbPass
+});
+
+dbConnection.connect((err) => {
+  if(err) throw err;
+  console.log('connected to db...');
+});
 
 //url hardcoded with 'orphan: first kill' recommendations
 //will allow user to select a movie and then display recommendations
