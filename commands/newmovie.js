@@ -40,10 +40,10 @@ let setMovieForUser = (movie) => {
   let movieName = movie.title.replace(/'/g, "''");
   let movieDescription = movie.description.replace(/'/g, "''");
   let sql = `CREATE TABLE if not exists users (username VARCHAR(25) NOT NULL PRIMARY KEY);
-            CREATE TABLE if not exists movies (title VARCHAR(50) NOT NULL PRIMARY KEY, url VARCHAR(100), release_date DATE, description VARCHAR(1000));
+            CREATE TABLE if not exists movies (title VARCHAR(50) NOT NULL PRIMARY KEY, poster_path VARCHAR(100), release_date DATE, description VARCHAR(1000));
             CREATE TABLE if not exists users_movies (username VARCHAR(25) NOT NULL, title VARCHAR(50) NOT NULL, PRIMARY KEY (username, title));
             INSERT IGNORE INTO users (username) VALUES ('cmoorelabs');
-            INSERT IGNORE INTO movies (title, url, release_date, description) VALUES ('${movieName}', '${movie.imageURL}', '${movie.release_date}', '${movieDescription}');
+            INSERT IGNORE INTO movies (title, poster_path, release_date, description) VALUES ('${movieName}', '${movie.poster_path}', '${movie.release_date}', '${movieDescription}');
             INSERT IGNORE INTO users_movies (username, title) VALUES ('cmoorelabs', '${movieName}');`;
   dbConnection.query(sql, (error, result) =>  {
     if(error) throw error;

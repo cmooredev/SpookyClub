@@ -19,6 +19,7 @@ let getMovieList = (interaction) => {
     const embeds = [];
     let embed;
     for (let movie of result){
+      console.log(`list ${movie.poster_path}`);
       embed = createMovieEmbed(movie);
       console.log(embed);
       embeds.push(embed);
