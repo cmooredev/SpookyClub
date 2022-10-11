@@ -36,7 +36,8 @@ let createMovieEmbed = (parsedMovie) => {
   let movieRecommendation = {
     imageURL: `https://image.tmdb.org/t/p/original/${movieChoice.poster_path}`,
     title: movieChoice.original_title,
-    description: movieChoice.overview
+    description: movieChoice.overview,
+    release_date: movieChoice.release_date
   }
 
   const movieEmbed = new EmbedBuilder()
@@ -52,10 +53,10 @@ let createMovieEmbed = (parsedMovie) => {
 
 let setMovieForUser = (movie) => {
   let sql = `CREATE TABLE if not exists users (username VARCHAR(25) NOT NULL PRIMARY KEY);
-            CREATE TABLE if not exists movies (title VARCHAR(50) NOT NULL PRIMARY KEY, url VARCHAR(100));
+            CREATE TABLE if not exists movies (title VARCHAR(50) NOT NULL PRIMARY KEY, url VARCHAR(100), release_date VARCHAR(15));
             CREATE TABLE if not exists users_movies (username VARCHAR(25) NOT NULL, title VARCHAR(50) NOT NULL, PRIMARY KEY (username, title));   
             INSERT IGNORE INTO users (username) VALUES ('cmoorelabs');
-            INSERT IGNORE INTO movies (title, url) VALUES ('${movie.title}', '${movie.imageURL}');
+            INSERT IGNORE INTO movies (title, url, release_date) VALUES ('${movie.title}', '${movie.imageURL}, '${String(movie.release_date)}');
             INSERT IGNORE INTO users_movies (username, title) VALUES ('cmoorelabs', '${movie.title}');`;
   dbConnection.query(sql, (error, result) =>  {
     if(error) throw error;
