@@ -1,20 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { tmdb_key, dbUser, dbPass, dbName } = require('../config.json');
+const { tmdb_key } = require('../config.json');
 const https = require('https');
-const mysql = require('mysql2');
-
-const dbConnection = mysql.createConnection({
-  multipleStatements: true,
-  host: 'localhost',
-  user: dbUser,
-  password: dbPass,
-  database: dbName
-});
-
-dbConnection.connect((err) => {
-  if(err) throw err;
-  console.log('connected to db...');
-});
+const { dbConnection } = require('../connect.js');
 
 //url hardcoded with 'orphan: first kill' recommendations
 //will allow user to select a movie and then display recommendations
@@ -22,7 +9,7 @@ const url = `https://api.themoviedb.org/3/movie/760161/similar?api_key=${tmdb_ke
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('movie')
+    .setName('newmovie')
     .setDescription('Replies with a trending spooky movie!'),
   execute(interaction) {
     https.get(url, response => {
@@ -64,19 +51,14 @@ let createMovieEmbed = (parsedMovie) => {
 };
 
 let setMovieForUser = (movie) => {
-  let sql = `CREATE TABLE if not exists userlist (username VARCHAR(25) PRIMARY KEY, title VARCHAR(50), url VARCHAR(100));  
-            INSERT INTO userlist (username, title, url) VALUES ('cmoorelabs', '${movie.title}', '${movie.imageURL}')`;
+  let sql = `CREATE TABLE if not exists users (username VARCHAR(25) NOT NULL PRIMARY KEY);
+            CREATE TABLE if not exists movies (title VARCHAR(50) NOT NULL PRIMARY KEY, url VARCHAR(100));
+            CREATE TABLE if not exists users_movies (username VARCHAR(25) NOT NULL, title VARCHAR(50) NOT NULL, PRIMARY KEY (username, title));   
+            INSERT IGNORE INTO users (username) VALUES ('cmoorelabs');
+            INSERT IGNORE INTO movies (title, url) VALUES ('${movie.title}', '${movie.imageURL}');
+            INSERT IGNORE INTO users_movies (username, title) VALUES ('cmoorelabs', '${movie.title}');`;
   dbConnection.query(sql, (error, result) =>  {
     if(error) throw error;
     console.log("1 record inserted");
-    getUserMovieList();
   });
-
-  let getUserMovieList = () => {
-    let sql = `SELECT * FROM userlist`;
-    dbConnection.query(sql, (error, result) => {
-      if(error) throw error;
-      console.log(result);
-    })
-  }
 }; 
