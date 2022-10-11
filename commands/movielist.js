@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const https = require('https');
 const { dbConnection } = require('../connect.js');
-const { createMovieListEmbed } = require('../movie.js');
+const { createMovieEmbed } = require('../movie.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -33,7 +33,7 @@ let getMovieList = (interaction) => {
     for (let movie of result){
       //console.log(`list ${movie.poster_path}`);
       console.log(`here we are ${movie.username}`);
-      embed = createMovieListEmbed(movie);
+      embed = createMovieEmbed(movie);
       console.log(embed);
       embeds.push(embed);
     }

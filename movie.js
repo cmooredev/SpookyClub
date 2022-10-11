@@ -21,11 +21,4 @@ let createMovieEmbed = (movie) => {
   return movieEmbed;
 };
 
-let createMovieListEmbed = (movie) => {
-  const movieEmbed = new EmbedBuilder()
-    .setColor(0xFFA500)
-    .setTitle(movie.title)
-  return movieEmbed;
-};
-
-  module.exports = { createMovie, createMovieEmbed, createMovieListEmbed };
+  module.exports = { createMovie, createMovieEmbed };

@@ -1,8 +1,16 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { tmdb_key } = require('../config.json');
 const https = require('https');
 const { dbConnection } = require('../connect.js');
 const { createMovie, createMovieEmbed } = require('../movie.js');
+
+const row = new ActionRowBuilder()
+          .addComponents(
+              new ButtonBuilder()
+                  .setCustomId('primary')
+                  .setLabel('Add')
+                  .setStyle(ButtonStyle.Primary),
+          );
 
 //url hardcoded with 'orphan: first kill' recommendations
 //will allow user to select a movie and then display recommendations
@@ -28,7 +36,10 @@ module.exports = {
         setMovieForUser(movie);
         let embed = createMovieEmbed(movie);
         console.log(embed);
-        await interaction.reply({ embeds: [embed] });
+
+        console.log(row);
+
+        await interaction.reply({ content: 'Click if you want to add ', ephemeral: true, embeds: [embed], components: [row] });
       })
     }).on('error', (err) => {
       console.log("Error: " + error.message);
