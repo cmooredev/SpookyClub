@@ -1,7 +1,8 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 const { tmdb_key } = require('../config.json');
 const https = require('https');
 const { dbConnection } = require('../connect.js');
+const { createMovie, createMovieEmbed } = require('../movie.js');
 
 //url hardcoded with 'orphan: first kill' recommendations
 //will allow user to select a movie and then display recommendations
@@ -13,51 +14,37 @@ module.exports = {
     .setDescription('Replies with a trending spooky movie!'),
   execute(interaction) {
     https.get(url, response => {
-      let data = '';
 
+      let data = '';
       response.on('data', chunk => {
         data += chunk;
       });
-
       response.on('end', async () => {
         parsedMovie = JSON.parse(data);
-        let embed = createMovieEmbed(parsedMovie);
+        let movieChoice = parsedMovie.results[Math.floor(Math.random() * 20)]
+        
+        let movie = createMovie(movieChoice);
+        
+        setMovieForUser(movie);
+        let embed = createMovieEmbed(movie);
+        console.log(embed);
         await interaction.reply({ embeds: [embed] });
       })
     }).on('error', (err) => {
       console.log("Error: " + error.message);
     });
-
   },
 };
 
-let createMovieEmbed = (parsedMovie) => {
-  let movieChoice = parsedMovie.results[Math.floor(Math.random() * 20)];
-  let movieRecommendation = {
-    imageURL: `https://image.tmdb.org/t/p/original/${movieChoice.poster_path}`,
-    title: movieChoice.original_title,
-    description: movieChoice.overview,
-    release_date: movieChoice.release_date
-  }
-
-  const movieEmbed = new EmbedBuilder()
-    .setColor(0xFFA500)
-    .setTitle(movieRecommendation.title)
-    .setDescription(movieRecommendation.description)
-    .setImage(movieRecommendation.imageURL);
-
-  console.log(movieChoice);
-  setMovieForUser(movieRecommendation);
-  return movieEmbed;
-};
-
 let setMovieForUser = (movie) => {
+  let movieName = movie.title.replace(/'/g, "''");
+  let movieDescription = movie.description.replace(/'/g, "''");
   let sql = `CREATE TABLE if not exists users (username VARCHAR(25) NOT NULL PRIMARY KEY);
-            CREATE TABLE if not exists movies (title VARCHAR(50) NOT NULL PRIMARY KEY, url VARCHAR(100), release_date VARCHAR(15));
-            CREATE TABLE if not exists users_movies (username VARCHAR(25) NOT NULL, title VARCHAR(50) NOT NULL, PRIMARY KEY (username, title));   
+            CREATE TABLE if not exists movies (title VARCHAR(50) NOT NULL PRIMARY KEY, url VARCHAR(100), release_date DATE, description VARCHAR(1000));
+            CREATE TABLE if not exists users_movies (username VARCHAR(25) NOT NULL, title VARCHAR(50) NOT NULL, PRIMARY KEY (username, title));
             INSERT IGNORE INTO users (username) VALUES ('cmoorelabs');
-            INSERT IGNORE INTO movies (title, url, release_date) VALUES ('${movie.title}', '${movie.imageURL}, '${String(movie.release_date)}');
-            INSERT IGNORE INTO users_movies (username, title) VALUES ('cmoorelabs', '${movie.title}');`;
+            INSERT IGNORE INTO movies (title, url, release_date, description) VALUES ('${movieName}', '${movie.imageURL}', '${movie.release_date}', '${movieDescription}');
+            INSERT IGNORE INTO users_movies (username, title) VALUES ('cmoorelabs', '${movieName}');`;
   dbConnection.query(sql, (error, result) =>  {
     if(error) throw error;
     console.log("1 record inserted");

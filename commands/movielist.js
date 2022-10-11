@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const https = require('https');
 const { dbConnection } = require('../connect.js');
+const { createMovieEmbed } = require('../movie.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -12,13 +13,15 @@ module.exports = {
 };
 
 let getMovieList = (interaction) => {
-  let sql = `SELECT * FROM users_movies`;
+  let sql = `SELECT * FROM movies`;
     dbConnection.query(sql, async (error, result) => {
     if(error) throw error;
-    const embed = new EmbedBuilder();
-    for (let movie in result){
-      embed.addFields({ name: `${result[movie].title}`, value: `${result[movie].title}` });
-      console.log(result[movie]);
+    const embeds = [];
+    let embed;
+    for (let movie of result){
+      embed = createMovieEmbed(movie);
+      console.log(embed);
+      embeds.push(embed);
     }
-    await interaction.reply({ embeds: [embed]});
+    await interaction.reply({ embeds: embeds});
 })};
