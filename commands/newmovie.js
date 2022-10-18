@@ -43,7 +43,7 @@ let displayMovie = (response, interaction) => {
       });
       response.on('end', async () => {
         parsedMovie = JSON.parse(data);
-        let movieChoice = parsedMovie.results[Math.floor(Math.random() * 20)]
+        let movieChoice = parsedMovie.results[Math.floor(Math.random() * 50)]
         
         let movie = createMovie(movieChoice);
         let embed = createMovieEmbed(movie);
