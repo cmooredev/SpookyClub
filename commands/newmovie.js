@@ -28,8 +28,16 @@ module.exports = {
     .setDescription('Replies with a trending spooky movie!'),
   execute(interaction) {
     https.get(url, response => {
+      displayMovie(response, interaction);
+      
+    }).on('error', (err) => {
+      console.log("Error: " + error.message);
+    });
+  },
+};
 
-      let data = '';
+let displayMovie = (response, interaction) => {
+  let data = '';
       response.on('data', chunk => {
         data += chunk;
       });
@@ -42,7 +50,7 @@ module.exports = {
 
         let message = await interaction.reply({ ephemeral: true, embeds: [embed], components: [buttonRow] });
 
-        const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 15000 });
+        const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button });
 
         //decide what to do with button interaction
         collector.on('collect', i => {
@@ -63,14 +71,9 @@ module.exports = {
         });
 
         collector.on('end', collected => {
-          console.log(`Collected ${collected.size} interactions.`);
         });
 
       })
-    }).on('error', (err) => {
-      console.log("Error: " + error.message);
-    });
-  },
 };
 
 let setMovieForUser = (movie, interaction) => {
@@ -84,7 +87,6 @@ let setMovieForUser = (movie, interaction) => {
             INSERT IGNORE INTO users_movies (username, title) VALUES ('${interaction.user.id}', '${movieName}');`;
   dbConnection.query(sql, async (error, result) =>  {
     if(!error) {
-      console.log("1 record inserted");
     } else {
       console.error(error);
       await interaction.reply(`Sorry there was an error ${error}`);

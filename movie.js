@@ -7,12 +7,10 @@ let createMovie = (movieChoice) => {
       description: movieChoice.overview,
       release_date: movieChoice.release_date
     };
-    console.log(`inside movie = ${movie.poster_path}`);
     return movie;
   };
   
 let createMovieEmbed = (movie) => {
-  console.log(`test ${movie.imageURL}`);
   const movieEmbed = new EmbedBuilder()
     .setColor(0xFFA500)
     .setImage(`https://image.tmdb.org/t/p/original${movie.poster_path}`)
@@ -37,12 +35,21 @@ let createBlankEmbed = (status) => {
   }
 };
 
+
 let createMovieBookEmbed = (movieList) => {
-  const movieEmbed = new EmbedBuilder()
-      .setColor(0x00BF03)
-      .setTitle(`Movie`)
-      .setDescription('✅ Added to your list.');
-    return movieEmbed;
+  const embeds = [];
+  let movieEmbed;
+  let movieBook = {
+    embeds,
+    currentPage: 0,
+  }
+  for (let movie of movieList){
+    movieEmbed = createMovieEmbed(movie);
+    embeds.push(movieEmbed);
+  }
+  return movieBook;
 };
+
+
 
   module.exports = { createMovie, createMovieEmbed, createBlankEmbed, createMovieBookEmbed };
