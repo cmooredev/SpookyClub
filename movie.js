@@ -21,4 +21,28 @@ let createMovieEmbed = (movie) => {
   return movieEmbed;
 };
 
-  module.exports = { createMovie, createMovieEmbed };
+let createBlankEmbed = (status) => {
+  if (status === 'add') {
+    const movieEmbed = new EmbedBuilder()
+      .setColor(0x00BF03)
+      .setTitle(`Movie`)
+      .setDescription('✅ Added to your list.');
+    return movieEmbed;
+  } else if (status === 'reject') {
+    const movieEmbed = new EmbedBuilder()
+      .setColor(0xFF0000)
+      .setTitle(`Movie`)
+      .setDescription('❌ Movie rejected.');
+    return movieEmbed;
+  }
+};
+
+let createMovieBookEmbed = (movieList) => {
+  const movieEmbed = new EmbedBuilder()
+      .setColor(0x00BF03)
+      .setTitle(`Movie`)
+      .setDescription('✅ Added to your list.');
+    return movieEmbed;
+};
+
+  module.exports = { createMovie, createMovieEmbed, createBlankEmbed, createMovieBookEmbed };

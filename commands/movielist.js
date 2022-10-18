@@ -20,22 +20,31 @@ let getMovieList = (interaction) => {
               users
             INNER JOIN 
               users_movies
+              
             ON 
               users_movies.username=users.username
             INNER JOIN
               movies
             ON
-              movies.title=users_movies.title`;
+              movies.title=users_movies.title
+            WHERE
+              users.username = ${interaction.user.id}
+            AND
+              users_movies.username = ${interaction.user.id}
+              `;
     dbConnection.query(sql, async (error, result) => {
-    if(error) throw error;
-    const embeds = [];
-    let embed;
-    for (let movie of result){
-      //console.log(`list ${movie.poster_path}`);
-      console.log(`here we are ${movie.username}`);
-      embed = createMovieEmbed(movie);
-      console.log(embed);
-      embeds.push(embed);
+      if(!error) {
+        const embeds = [];
+        let embed;
+        for (let movie of result){
+          embed = createMovieEmbed(movie);
+          console.log(embed);
+          embeds.push(embed);
+      }
+      await interaction.reply({ embeds: embeds});
+    } else {
+      console.error(error);
+      await interaction.reply(`Sorry there was an error ${error}`);
     }
-    await interaction.reply({ embeds: embeds});
+    
 })};
