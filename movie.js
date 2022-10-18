@@ -32,6 +32,12 @@ let createBlankEmbed = (status) => {
       .setTitle(`Movie`)
       .setDescription('❌ Movie rejected.');
     return movieEmbed;
+  } else if (status === 'blankbook') {
+    const movieEmbed = new EmbedBuilder()
+      .setColor(0x000000)
+      .setTitle(`Add a new movie!`)
+      .setDescription('Your list is blank.');
+    return movieEmbed;
   }
 };
 
